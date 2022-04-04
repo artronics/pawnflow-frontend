@@ -13,10 +13,12 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import ListItemText from '@mui/material/ListItemText';
 import MuiDrawer from '@mui/material/Drawer';
+import { Home, Person, PersonAdd } from '@mui/icons-material';
+import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import HomePage from '../home/Home';
+
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -89,6 +91,49 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+type NavItemProps = {
+  open: any
+  text: string
+  to: string
+  children: JSX.Element
+}
+
+const NavItem = ({ open, text, to, children }: NavItemProps) => {
+  const navigate = useNavigate();
+  return (
+    <ListItemButton
+      onClick={() => navigate(to)}
+      sx={{
+        minHeight: 48,
+        justifyContent: open ? 'initial' : 'center',
+        px: 2.5,
+      }}
+    >
+      <ListItemIcon
+        sx={{
+          minWidth: 0,
+          mr: open ? 3 : 'auto',
+          justifyContent: 'center',
+        }}
+      >
+        {children}
+      </ListItemIcon>
+      <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+    </ListItemButton>
+  );
+};
+
+function LayoutRoutes() {
+  return (
+    <Routes>
+      <Route path="/">
+        <Route index element={<HomePage />} />
+        <Route path="customers" element={<NewCustomer />} />
+      </Route>
+    </Routes>
+  );
+}
+
 function AppLayout() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -101,61 +146,47 @@ function AppLayout() {
     setOpen(false);
   };
   return (
-    <Box sx={{ display: 'fixed', height: '100%' }}>
-      <AppBar position="fixed" elevation={0} sx={{ height: '4em' }} open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">Pawnflow </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItemButton
-              key={text}
+    <React.Fragment>
+      <Box sx={{ display: 'fixed', height: '100%' }}>
+        <AppBar position="fixed" elevation={0} sx={{ height: '4em' }} open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
               sx={{
-                minHeight: 48,
-                justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
+                marginRight: 5,
+                ...(open && { display: 'none' }),
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : 'auto',
-                  justifyContent: 'center',
-                }}
-              >
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          ))}
-        </List>
-        <Divider />
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, alignItems: 'stretch', height: '100%', display: 'flex', pt: '4em' }}>
-        <Box sx={{ overflowY: 'auto', margin: '1em 2em 0 2em' }} flexGrow={1}><NewCustomer /></Box>
-        <Box bgcolor="lightpink" flex="1">receipt</Box>
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">Pawnflow </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            <NavItem open={open} text="Home" to="/"><Home /></NavItem>
+          </List>
+          <Divider />
+          <List>
+            <NavItem open={open} text="Customers" to="customers"><Person /></NavItem>
+            <NavItem open={open} text="Add Customer" to="customers/new"><PersonAdd /></NavItem>
+          </List>
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, alignItems: 'stretch', height: '100%', display: 'flex', pt: '4em' }}>
+          <Box sx={{ overflowY: 'auto', margin: '1em 2em 0 2em' }} flexGrow={1}><Outlet /></Box>
+          <Box bgcolor="lightpink" flex="1">receipt</Box>
+        </Box>
       </Box>
-    </Box>
+    </React.Fragment>
   );
 }
 
