@@ -4,6 +4,9 @@ import { CssBaseline } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './home/Home';
 import NewCustomer from './customer/NewCustomer';
+import Login from './auth/Login';
+import Customer from './customer/Customer';
+import CustomerHome from './customer/CustomerHome';
 
 function AppRoutes() {
   return (
@@ -11,8 +14,12 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="customers" element={<NewCustomer />} />
+          <Route path="/customers" element={<Customer />}>
+            <Route index element={<CustomerHome />} />
+            <Route path="new" element={<NewCustomer />} />
+          </Route>
         </Route>
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>);
 }

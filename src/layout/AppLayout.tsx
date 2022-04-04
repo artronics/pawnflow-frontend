@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import NewCustomer from '../customer/NewCustomer';
 import Box from '@mui/material/Box';
@@ -15,9 +16,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MuiDrawer from '@mui/material/Drawer';
-import { Home, Person, PersonAdd } from '@mui/icons-material';
-import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { AccountCircle, Home, Person, PersonAdd } from '@mui/icons-material';
+import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import HomePage from '../home/Home';
+import { Menu, MenuItem } from '@mui/material';
 
 
 interface AppBarProps extends MuiAppBarProps {
@@ -145,6 +147,15 @@ function AppLayout() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <React.Fragment>
       <Box sx={{ display: 'fixed', height: '100%' }}>
@@ -162,7 +173,24 @@ function AppLayout() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">Pawnflow </Typography>
+            <Typography variant="h6" noWrap component="div" flexGrow={1}>Pawnflow </Typography>
+            <div>
+              <IconButton size="large" onClick={handleMenu} color="inherit"> <AccountCircle /></IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 50,
+                  horizontal: -80,
+                }}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}><Link className="btn-link" to="/login">Sign out</Link></MenuItem>
+              </Menu>
+            </div>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -177,7 +205,7 @@ function AppLayout() {
           </List>
           <Divider />
           <List>
-            <NavItem open={open} text="Customers" to="customers"><Person /></NavItem>
+            <NavItem open={open} text="Customers" to="/customers"><Person /></NavItem>
             <NavItem open={open} text="Add Customer" to="customers/new"><PersonAdd /></NavItem>
           </List>
         </Drawer>
